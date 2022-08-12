@@ -6,13 +6,13 @@ import { ContextOptions } from './types'
 declare global {
   interface Window {
     ReactQueryClientContext?: React.Context<QueryClient | undefined>
+    ReactQueryClientSharingContext?: React.Context<boolean>
   }
 }
 
 export const defaultContext = React.createContext<QueryClient | undefined>(
   undefined,
 )
-const QueryClientSharingContext = React.createContext<boolean>(false)
 
 // If we are given a context, we will use it.
 // Otherwise, if contextSharing is on, we share the first and at least one
@@ -38,6 +38,16 @@ function getQueryClientContext(
 
   return defaultContext
 }
+
+function getQueryClientSharingContext() {
+  if (!window.ReactQueryClientSharingContext) {
+    window.ReactQueryClientSharingContext = React.createContext<boolean>(false)
+  }
+
+  return window.ReactQueryClientSharingContext
+}
+
+const QueryClientSharingContext = getQueryClientSharingContext()
 
 export const useQueryClient = ({ context }: ContextOptions = {}) => {
   const queryClient = React.useContext(
